@@ -45,14 +45,16 @@ void Test::UserExec() {
   auto is_primary = GetVar("sim_tracks/is_primary");
   auto psi_rp = GetVar("sim_header/reaction_plane");
   auto impact_parameter = GetVar("sim_header/impact_parameter");
+  auto centrality = GetVar("event_header/selected_tof_rpc_hits_centrality");
   auto beam_rapidity = data_header_->GetBeamRapidity();
 
   auto rp = (*sim_header_)[psi_rp].GetVal();
   auto b = (*sim_header_)[impact_parameter].GetVal();
+  auto cent = (*event_header_)[centrality].GetVal();
 
-  if(  b < 6.5 )
+  if( cent < 20 )
     return;
-  if( b > 8.5 )
+  if( cent > 25 )
     return;
 
   for( auto track : sim_tracks_->Loop() ){
