@@ -69,14 +69,15 @@ void Test::UserExec() {
       continue;
     if( fabs(y) > 0.25 )
       continue;
-    auto delta_phi = mom4.Phi() - rp;
+    auto phi = mom4.Phi();
+    auto delta_phi = phi - rp;
     if( y > 0.0 ){
-      v1_pos_uniform_bins_->Fill( - cos(delta_phi), mom4.Pt() );
-      v1_pos_analysis_bins_->Fill( - cos(delta_phi), mom4.Pt() );
+      v1_pos_uniform_bins_->Fill(  mom4.Pt(), -cos(delta_phi) );
+      v1_pos_analysis_bins_->Fill(  mom4.Pt(), -cos(delta_phi) );
     }
     if( y < 0.0 ){
-      v1_neg_uniform_bins_->Fill( - cos(delta_phi), mom4.Pt() );
-      v1_neg_analysis_bins_->Fill( - cos(delta_phi), mom4.Pt() );
+      v1_neg_uniform_bins_->Fill(  mom4.Pt(), cos(delta_phi) );
+      v1_neg_analysis_bins_->Fill(  mom4.Pt(), cos(delta_phi)  );
     }
   }
 }
