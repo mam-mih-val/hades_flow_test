@@ -85,8 +85,8 @@ void Test::UserExec() {
     v1_straight_->Fill( y, mom4.Pt(), cos(delta_phi) );
     v1_reflected_->Fill( -y, mom4.Pt(), cos(delta_phi) );
 
-    v1_even_->Fill( y, mom4.Pt(), cos(delta_phi) );
-    v1_even_->Fill( -y, mom4.Pt(), cos(delta_phi) );
+    v1_even_->Fill( y, mom4.Pt(), 0.5*cos(delta_phi) );
+    v1_even_->Fill( -y, mom4.Pt(), 0.5*cos(delta_phi) );
   }
 }
 void Test::UserFinish() {
