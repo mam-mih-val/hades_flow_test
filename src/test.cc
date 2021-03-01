@@ -22,11 +22,22 @@ void Test::PreInit() {
 }
 
 void Test::UserInit(std::map<std::string, void *> &Map) {
-  std::vector<float> pt_axis{0, 0.29375, 0.35625, 0.41875, 0.48125, 0.54375, 0.61875, 0.70625, 0.81875, 1.01875, 2.0};
-  v1_pos_analysis_bins_ = new TProfile( "v1_pos_analysis_bins_", "FW-analysis", pt_axis.size()-1, pt_axis.data() );
-  v1_neg_analysis_bins_ = new TProfile( "v1_neg_analysis_bins_", "BW-analysis", pt_axis.size()-1, pt_axis.data() );
-  v1_pos_uniform_bins_ = new TProfile( "v1_pos_uniform_bins_", "FW-uniform", 14, 0.0, 1.4 );
-  v1_neg_uniform_bins_ = new TProfile( "v1_neg_uniform_bins_", "BW-uniform", 14, 0.0, 1.4);
+  std::vector<double> pt_axis{0, 0.29375, 0.35625, 0.41875, 0.48125, 0.54375, 0.61875, 0.70625, 0.81875, 1.01875, 2.0};
+  std::vector<double> y_axis;
+  float y=-0.75;
+  while( y < 0.76 ){
+    y_axis.push_back(y);
+    y+=0.1;
+  }
+  v1_even_ = new TProfile2D( "v1_even_10_40pc", ";y_{cm};p_{T}",
+                            y_axis.size()-1, y_axis.data(),
+                            pt_axis.size()-1, pt_axis.data() );
+  v1_straight_ = new TProfile2D( "v1_(y)_10_40pc", ";y_{cm};p_{T}",
+                            y_axis.size()-1, y_axis.data(),
+                            pt_axis.size()-1, pt_axis.data() );
+  v1_reflected_ = new TProfile2D( "v1_(-y)_10_40pc", ";y_{cm};p_{T}",
+                            y_axis.size()-1, y_axis.data(),
+                            pt_axis.size()-1, pt_axis.data() );
 
   sim_tracks_ = GetInBranch("sim_tracks");
   event_header_ = GetInBranch("event_header");
@@ -52,9 +63,9 @@ void Test::UserExec() {
   auto b = (*sim_header_)[impact_parameter].GetVal();
   auto cent = (*event_header_)[centrality].GetVal();
 
-  if( cent < 20 )
+  if( cent < 10 )
     return;
-  if( cent > 25 )
+  if( cent > 40 )
     return;
 
   for( auto track : sim_tracks_->Loop() ){
@@ -67,25 +78,19 @@ void Test::UserExec() {
       continue;
     auto mom4 = track.DataT<Track>()->Get4Momentum(pid);
     auto y = mom4.Rapidity()-beam_rapidity;
-    if( fabs(y) < 0.15 )
-      continue;
-    if( fabs(y) > 0.25 )
-      continue;
+
     auto phi = mom4.Phi();
     auto delta_phi = phi - rp;
-    if( y > 0.0 ){
-      v1_pos_uniform_bins_->Fill(  mom4.Pt(), -cos(delta_phi) );
-      v1_pos_analysis_bins_->Fill(  mom4.Pt(), -cos(delta_phi) );
-    }
-    if( y < 0.0 ){
-      v1_neg_uniform_bins_->Fill(  mom4.Pt(), cos(delta_phi) );
-      v1_neg_analysis_bins_->Fill(  mom4.Pt(), cos(delta_phi)  );
-    }
+
+    v1_straight_->Fill( y, mom4.Pt(), cos(delta_phi) );
+    v1_reflected_->Fill( -y, mom4.Pt(), cos(delta_phi) );
+
+    v1_even_->Fill( y, mom4.Pt(), cos(delta_phi) );
+    v1_even_->Fill( -y, mom4.Pt(), cos(delta_phi) );
   }
 }
 void Test::UserFinish() {
-  v1_pos_analysis_bins_->Write();
-  v1_pos_uniform_bins_->Write();
-  v1_neg_analysis_bins_->Write();
-  v1_neg_uniform_bins_->Write();
+  v1_straight_->Write();
+  v1_reflected_->Write();
+  v1_even_->Write();
 }

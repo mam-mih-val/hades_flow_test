@@ -10,11 +10,12 @@
 #include <at_task/UserTask.h>
 #include <at_task/Task.h>
 
-#include <AnalysisTree/Matching.hpp>
-#include <AnalysisTree/Detector.hpp>
-#include <AnalysisTree/Particle.hpp>
 #include <AnalysisTree/BranchConfig.hpp>
+#include <AnalysisTree/Detector.hpp>
 #include <AnalysisTree/EventHeader.hpp>
+#include <AnalysisTree/Matching.hpp>
+#include <AnalysisTree/Particle.hpp>
+#include <TProfile2D.h>
 
 class Test : public UserFillTask {
 
@@ -33,10 +34,9 @@ private:
   ATI2::Branch* event_header_;
   ATI2::Branch* sim_header_;
 
-  TProfile* v1_pos_uniform_bins_;
-  TProfile* v1_neg_uniform_bins_;
-  TProfile* v1_pos_analysis_bins_;
-  TProfile* v1_neg_analysis_bins_;
+  TProfile2D* v1_even_;
+  TProfile2D* v1_straight_;
+  TProfile2D* v1_reflected_;
 
 TASK_DEF(Test, 0)
 };
