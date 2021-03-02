@@ -24,9 +24,9 @@ module load compiler/gcc/9
 echo "loading " $ownroot
 source $ownroot
 
-echo "executing $build_dir/test -i list.txt -t hades_analysis_tree -n 1 -o out.root"
+echo "executing $build_dir/test -i list.txt -t hades_analysis_tree -n 1 -o out.root --output-tree-name """
 
-$build_dir/test -i list.txt -t hades_analysis_tree -n 1 -o out.root
+$build_dir/test -i list.txt -t hades_analysis_tree -n 1 -o out.root --output-tree-name ""
 
 date $format
 echo JOB FINISHED!
