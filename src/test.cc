@@ -22,6 +22,7 @@ void Test::PreInit() {
 }
 
 void Test::UserInit(std::map<std::string, void *> &Map) {
+  std::cout << "Test::UserInit(): CALL" << std::endl;
   std::vector<double> pt_axis{0, 0.29375, 0.35625, 0.41875, 0.48125, 0.54375, 0.61875, 0.70625, 0.81875, 1.01875, 2.0};
   std::vector<double> y_axis;
   float y=-0.75;
@@ -43,20 +44,21 @@ void Test::UserInit(std::map<std::string, void *> &Map) {
   event_header_ = GetInBranch("event_header");
   sim_header_ = GetInBranch("sim_header");
 
+  pdg_code = GetVar("sim_tracks/pid");
+  is_primary = GetVar("sim_tracks/is_primary");
+  psi_rp = GetVar("sim_header/reaction_plane");
+  impact_parameter = GetVar("sim_header/impact_parameter");
+  centrality = GetVar("event_header/selected_tof_rpc_hits_centrality");
+
   sim_tracks_->GetConfig().Print();
   event_header_->GetConfig().Print();
   sim_header_->GetConfig().Print();
-
+  std::cout << "Test::UserInit(): RETURN" << std::endl;
 }
 
 void Test::UserExec() {
   using AnalysisTree::Track;
 
-  auto pdg_code = GetVar("sim_tracks/pid");
-  auto is_primary = GetVar("sim_tracks/is_primary");
-  auto psi_rp = GetVar("sim_header/reaction_plane");
-  auto impact_parameter = GetVar("sim_header/impact_parameter");
-  auto centrality = GetVar("event_header/selected_tof_rpc_hits_centrality");
   auto beam_rapidity = data_header_->GetBeamRapidity();
 
   auto rp = (*sim_header_)[psi_rp].GetVal();
@@ -90,7 +92,9 @@ void Test::UserExec() {
   }
 }
 void Test::UserFinish() {
+  std::cout << "Test::UserFinish(): CALL" << std::endl;
   v1_straight_->Write();
   v1_reflected_->Write();
   v1_even_->Write();
+  std::cout << "Test::UserFinish(): RETURN" << std::endl;
 }

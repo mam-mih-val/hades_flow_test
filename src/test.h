@@ -26,13 +26,21 @@ public:
   boost::program_options::options_description GetBoostOptions() override;
   void PreInit() override;
   void PostFinish() override {
+    std::cout << "Test::PostFinish(): CALL" << std::endl;
     UserTask::PostFinish();
+    std::cout << "Test::PostFinish(): RETURN" << std::endl;
   }
 
 private:
   ATI2::Branch* sim_tracks_;
   ATI2::Branch* event_header_;
   ATI2::Branch* sim_header_;
+
+  ATI2::Variable pdg_code;
+  ATI2::Variable is_primary;
+  ATI2::Variable psi_rp;
+  ATI2::Variable impact_parameter;
+  ATI2::Variable centrality;
 
   TProfile2D* v1_even_;
   TProfile2D* v1_straight_;
