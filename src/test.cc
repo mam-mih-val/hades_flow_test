@@ -83,9 +83,9 @@ void Test::UserExec() {
       continue;
     auto mom4 = track.DataT<Track>()->Get4Momentum(pid);
     auto y = mom4.Rapidity()-beam_rapidity;
-    if( y < -0.25 )
+    if( y < 0.15 )
       continue;
-    if (y > -0.15)
+    if (y > 0.25)
       continue;
     auto pT = mom4.Pt();
     auto phi = mom4.Phi();
