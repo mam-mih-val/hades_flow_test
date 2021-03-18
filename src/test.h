@@ -33,8 +33,12 @@ public:
 
 private:
   ATI2::Branch* sim_tracks_;
+  ATI2::Branch* reco_tracks_;
   ATI2::Branch* event_header_;
   ATI2::Branch* sim_header_;
+  ATI2::Variable dca_xy_;
+  ATI2::Variable dca_z_;
+  ATI2::Variable chi2_;
 
   ATI2::Variable pdg_code;
   ATI2::Variable is_primary;

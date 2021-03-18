@@ -34,10 +34,14 @@ void Test::UserInit(std::map<std::string, void *> &Map) {
   v1_unifrom_binning_ = new TProfile( "v1_uniform", ";p_{T} [GeV/c];v_{1}", 16, 0.0, 1.6 );
 
   sim_tracks_ = GetInBranch("sim_tracks");
+  reco_tracks_ = GetInBranch("mdc_vtx_tracks");
   event_header_ = GetInBranch("event_header");
   sim_header_ = GetInBranch("sim_header");
 
-  pdg_code = GetVar("sim_tracks/pid");
+  pdg_code = GetVar("mdc_vtx_tracks/pid");
+  dca_z_ = GetVar("mdc_vtx_tracks/dca_z");
+  dca_xy_ = GetVar("mdc_vtx_tracks/dca_xy");
+  chi2_ = GetVar("mdc_vtx_tracks/chi2");
   is_primary = GetVar("sim_tracks/is_primary");
   psi_rp = GetVar("sim_header/reaction_plane");
   impact_parameter = GetVar("sim_header/impact_parameter");
@@ -63,13 +67,19 @@ void Test::UserExec() {
   if( cent > 25 )
     return;
 
-  for( auto track : sim_tracks_->Loop() ){
+  for( auto track : reco_tracks_->Loop() ){
     auto pid = track[pdg_code].GetInt();
     if( pid != 2212 ) {
       continue;
     }
-    auto primary = track[is_primary].GetBool();
-    if( !primary )
+    auto chi2 = track[chi2_].GetVal();
+    auto dca_xy = track[dca_xy_].GetVal();
+    auto dca_z = track[dca_z_].GetVal();
+    if( chi2 > 100.0 )
+      continue;
+    if ( -10 > dca_xy || dca_xy > 10 )
+      continue;
+    if ( -10 > dca_z || dca_z > 10 )
       continue;
     auto mom4 = track.DataT<Track>()->Get4Momentum(pid);
     auto y = mom4.Rapidity()-beam_rapidity;
