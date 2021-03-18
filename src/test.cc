@@ -23,22 +23,15 @@ void Test::PreInit() {
 
 void Test::UserInit(std::map<std::string, void *> &Map) {
   std::cout << "Test::UserInit(): CALL" << std::endl;
-  std::vector<double> pt_axis{0, 0.29375, 0.35625, 0.41875, 0.48125, 0.54375, 0.61875, 0.70625, 0.81875, 1.01875, 2.0};
+  std::vector<double> pt_axis{0.0, 0.29375, 0.35625, 0.41875, 0.48125, 0.54375, 0.61875, 0.70625, 0.81875, 1.01875, 2.0};
   std::vector<double> y_axis;
   float y=-0.75;
   while( y < 0.76 ){
     y_axis.push_back(y);
     y+=0.1;
   }
-  v1_even_ = new TProfile2D( "v1_even_10_40pc", ";y_{cm};p_{T}",
-                            y_axis.size()-1, y_axis.data(),
-                            pt_axis.size()-1, pt_axis.data() );
-  v1_straight_ = new TProfile2D( "v1_(y)_10_40pc", ";y_{cm};p_{T}",
-                            y_axis.size()-1, y_axis.data(),
-                            pt_axis.size()-1, pt_axis.data() );
-  v1_reflected_ = new TProfile2D( "v1_(-y)_10_40pc", ";y_{cm};p_{T}",
-                            y_axis.size()-1, y_axis.data(),
-                            pt_axis.size()-1, pt_axis.data() );
+  v1_non_unifrom_binning_ = new TProfile( "v1_non_uniform", ";p_{T} [GeV/c];v_{1}", pt_axis.size()-1, pt_axis.data() );
+  v1_unifrom_binning_ = new TProfile( "v1_uniform", ";p_{T} [GeV/c];v_{1}", 16, 0.0, 1.6 );
 
   sim_tracks_ = GetInBranch("sim_tracks");
   event_header_ = GetInBranch("event_header");
@@ -65,9 +58,9 @@ void Test::UserExec() {
   auto b = (*sim_header_)[impact_parameter].GetVal();
   auto cent = (*event_header_)[centrality].GetVal();
 
-  if( cent < 10 )
+  if( cent < 20 )
     return;
-  if( cent > 40 )
+  if( cent > 25 )
     return;
 
   for( auto track : sim_tracks_->Loop() ){
@@ -80,21 +73,20 @@ void Test::UserExec() {
       continue;
     auto mom4 = track.DataT<Track>()->Get4Momentum(pid);
     auto y = mom4.Rapidity()-beam_rapidity;
-
+    if( y < -0.25 )
+      continue;
+    if (y > -0.15)
+      continue;
+    auto pT = mom4.Pt();
     auto phi = mom4.Phi();
     auto delta_phi = phi - rp;
-
-    v1_straight_->Fill( y, mom4.Pt(), cos(delta_phi) );
-    v1_reflected_->Fill( -y, mom4.Pt(), cos(delta_phi) );
-
-    v1_even_->Fill( y, mom4.Pt(), 0.5*cos(delta_phi) );
-    v1_even_->Fill( -y, mom4.Pt(), 0.5*cos(delta_phi) );
+    v1_unifrom_binning_->Fill(pT, cos(delta_phi));
+    v1_non_unifrom_binning_->Fill(pT, cos(delta_phi));
   }
 }
 void Test::UserFinish() {
   std::cout << "Test::UserFinish(): CALL" << std::endl;
-  v1_straight_->Write();
-  v1_reflected_->Write();
-  v1_even_->Write();
+  v1_unifrom_binning_->Write();
+  v1_non_unifrom_binning_->Write();
   std::cout << "Test::UserFinish(): RETURN" << std::endl;
 }

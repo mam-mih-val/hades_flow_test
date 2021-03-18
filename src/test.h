@@ -42,9 +42,8 @@ private:
   ATI2::Variable impact_parameter;
   ATI2::Variable centrality;
 
-  TProfile2D* v1_even_;
-  TProfile2D* v1_straight_;
-  TProfile2D* v1_reflected_;
+  TProfile* v1_unifrom_binning_;
+  TProfile* v1_non_unifrom_binning_;
 
 TASK_DEF(Test, 0)
 };
